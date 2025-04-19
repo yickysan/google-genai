@@ -12,4 +12,12 @@ dependencies = [
     "duckduckgo-search>=8.0.1",
     "langchain-community>=0.3.21",
     "python-dotenv>=1.1.0",
+    "unstructured[all-docs]>=0.17.2",
+    "langchain-text-splitters>=0.3.8",
+    "sqlite-vec>=0.1.6",
+    "transformers>=4.51.3",
+    "sentence-transformers>=4.1.0",
+    "langchain-huggingface>=0.1.2",
+    "langchain-unstructured>=0.1.6",
+    "hf-xet>=1.0.3",
 ]
