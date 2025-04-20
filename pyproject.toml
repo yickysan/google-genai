@@ -20,4 +20,6 @@ dependencies = [
     "langchain-huggingface>=0.1.2",
     "langchain-unstructured>=0.1.6",
     "hf-xet>=1.0.3",
+    "ollama>=0.4.8",
+    "langchain-ollama>=0.3.2",
 ]
