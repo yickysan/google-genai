@@ -12,7 +12,7 @@ from . import LLM
 
 doc_path = Path("C:/Users/aeniatorudabo/Documents/7.3 - AML CFT CPF Policy.pdf")
 
-connection = SQLiteVec.create_connection(db_file="vec.db")
+connection = SQLiteVec.create_connection(db_file="policies.db")
 
 EMBEDDINGS = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
@@ -32,8 +32,8 @@ def add_document_to_vectorstore(file: str | Path) -> SQLiteVec:
 
     vectorstore = SQLiteVec.from_documents(chunks,
                                             embedding=embeddings,
-                                            persist_directory="vectorstore.db",
-                                            collection_name="audit_policy",)
+                                            table = "policy",
+                                            db_file="policies.db")
 
     return vectorstore
 

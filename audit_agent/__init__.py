@@ -30,4 +30,4 @@ OLLAMA = ChatOllama(
     streaming=True,
 )
 
-LLM = OLLAMA
+LLM = GOOGLE

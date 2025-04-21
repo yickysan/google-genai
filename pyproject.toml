@@ -22,4 +22,5 @@ dependencies = [
     "hf-xet>=1.0.3",
     "ollama>=0.4.8",
     "langchain-ollama>=0.3.2",
+    "notebook>=7.4.0",
 ]

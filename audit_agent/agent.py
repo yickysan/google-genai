@@ -16,28 +16,30 @@ search_tool = DuckDuckGoSearchResults()
 
 llm_router = LLM.with_structured_output(Router)
 
-SYS_PROMPT = (
-    "system",
-    "You are a helpful assistant to help the internal audit staff achieve their goals"
-    "Auditors will come to you with questions about the audit process that should be tested for an audit"
-    "You will answer them to the best of your ability and give reasons for your answers"
-    "They will also ask you aabout the bank's policies, you will answer by retrieving the policy from a vector database"
-    "If you don't know the answer, say 'I don't know'"
-    "You are allowed to search the web for answers. Review answers getting from web search and combine multiple results into a final answer"
-    "Include sources for your final output of the websearch"
-    "Always confirm with auditors if they have additional information to add to the question"
-    "If they do, ask them to provide it"
-    "If they don't, ask them to provide a summary of the question"
-    "Do not show tool names to the user"
-    "Do not show the tool code to the user, only the final answer"
-)
+SYS_PROMPT = """
+    system,
+    You are a helpful assistant to help the internal audit staff achieve their goals
+    Auditors will come to you with questions about the audit process that should be tested for an audit
+    You will answer them to the best of your ability and give reasons for your answers
+    They will also ask you about the bank's policies, context will be provided to you
+    You will answer them to the best of your ability using the provided context and give reasons for your answers
+    If you don't know the answer, say 'I don't know'
+    You are allowed to search the web for answers. Review answers getting from web search and combine multiple results into a final answer
+    Include sources for your final output of the websearch
+    Always confirm with auditors if they have additional information to add to the question
+    If they do, ask them to provide it
+    If they don't, ask them to provide a summary of the question
+    Do not show tool names to the user
+    Do not show the tool code to the user, only the final answer
+    context: {context}
+    """
 
 WELCOME_PROMPT = (
     "Welcome to the Audit Assistant "
     "I am here to help you with your audit questions.\n"
     "Please ask me anything about the audit process or the bank's policies.\n"
     "Type exit or quit to end the conversation."
-)
+    )
 
 
 class AuditAssistantState(TypedDict):
@@ -48,12 +50,15 @@ class AuditAssistantState(TypedDict):
     messages: Annotated[list, add_messages]
     decision: str
     finished: bool
+    context: str
 
 
 def audit_assistant(state: AuditAssistantState) -> AuditAssistantState:
 
+    context = state.get("context", "You are an audit assistant")
+
     if state["messages"]:
-        message_history = [SYS_PROMPT] + state["messages"]
+        message_history = [SYS_PROMPT.format(context=context)] + state["messages"]
         output = LLM.invoke(message_history)
 
     else:
@@ -61,7 +66,7 @@ def audit_assistant(state: AuditAssistantState) -> AuditAssistantState:
 
     return state | {"messages": [output]}
 
-def search_tool_node(state: AuditAssistantState) -> AuditAssistantState:
+def search(state: AuditAssistantState) -> AuditAssistantState:
     """
     Call the search to search the web
     """
@@ -75,7 +80,7 @@ def search_tool_node(state: AuditAssistantState) -> AuditAssistantState:
     response = search_tool.invoke(query)
 
     # Add the response to the state
-    return state | {"messages": [("tool", response)]}
+    return state | {"context": response}
 
 
 def human_node(state: AuditAssistantState) -> AuditAssistantState:
@@ -144,7 +149,7 @@ def maybe_route_to_tools(state: AuditAssistantState) -> Literal["tools", "human"
     else:
         return "human"
     
-def policy_node(state: AuditAssistantState) -> AuditAssistantState:
+def retrieve(state: AuditAssistantState) -> AuditAssistantState:
     """
     Call the retriever tool to get the policy
     """
@@ -158,7 +163,7 @@ def policy_node(state: AuditAssistantState) -> AuditAssistantState:
     response = retriever.invoke(query)
 
     # Add the response to the state
-    return state | {"messages": response}
+    return state | {"context": response}
 
 
 
