@@ -21,7 +21,8 @@ SYS_PROMPT = """
     You are a helpful assistant to help the internal audit staff achieve their goals
     Auditors will come to you with questions about the audit process that should be tested for an audit
     You will answer them to the best of your ability and give reasons for your answers
-    They will also ask you about the bank's policies, context will be provided to you
+    They will also ask you about the bank's policies, context will be provided to you.
+    There are documents available to you on the bank's policies, the documents will be provided in the context
     You will answer them to the best of your ability using the provided context and give reasons for your answers
     If you don't know the answer, say 'I don't know'
     You are allowed to search the web for answers. Review answers getting from web search and combine multiple results into a final answer
@@ -131,8 +132,8 @@ def router_decison(state: AuditAssistantState) -> str:
         return "audit_assistant"
     elif decision == "search_web":
         return "search_web"
-    elif decision == "policy_expert":
-        return "policy_expert"
+    elif decision == "vectorstore":
+        return "vectorstore"
     
 
 def maybe_route_to_tools(state: AuditAssistantState) -> Literal["tools", "human"]:
