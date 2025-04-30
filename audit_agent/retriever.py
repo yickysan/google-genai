@@ -3,6 +3,7 @@ from pathlib import Path
 from langchain_unstructured import UnstructuredLoader
 from langchain_community.vectorstores import SQLiteVec
 from langchain_huggingface import HuggingFaceEmbeddings
+#from langchain_ollama import OllamaEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain.prompts import PromptTemplate
@@ -10,21 +11,24 @@ from langchain.prompts import PromptTemplate
 from . import LLM
 
 
-doc_path = Path("C:/Users/aeniatorudabo/Documents/7.3 - AML CFT CPF Policy.pdf")
+docs = [Path("C:/Users/aeniatorudabo/Documents/7.3 - AML CFT CPF Policy.pdf"),
+        Path("C:/Users/aeniatorudabo/Downloads/FSDH IA Standards and Procedures Manual - Bank.pdf")]
+
 
 connection = SQLiteVec.create_connection(db_file="policies.db")
 
 EMBEDDINGS = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-def load_document(file: str | Path) -> list[str]:
-    loader = UnstructuredLoader(file)
+def load_document(files: str | Path | list[str | Path]) -> list[str]:
+    loader = UnstructuredLoader(files)
     return loader.load()
 
-def add_document_to_vectorstore(file: str | Path) -> SQLiteVec:
+def add_document_to_vectorstore() -> SQLiteVec:
 
-    doc = load_document(file)
+    doc = load_document(docs)
 
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    #embeddings2 = OllamaEmbeddings(model="nomic-embed-text")
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=7500, chunk_overlap=100)
 
@@ -73,11 +77,11 @@ def retriever(query: str) -> list[str]:
 
     # Generate a response based on the retrieved documents
     context = "\n".join([doc.page_content for doc in docs])
-    prompt = f"""
-    Answer the question based ONLY on the following context:
-    {context}
-    Question: {query}
-    Give your output in markdown format
-    """
-    response = LLM.invoke(prompt)
-    return response.content
+    # prompt = f"""
+    # Answer the question based ONLY on the following context:
+    # {context}
+    # Question: {query}
+    # Give your output in markdown format
+    # """
+    # response = LLM.invoke(prompt)
+    return context
