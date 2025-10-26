@@ -7,6 +7,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain.prompts import PromptTemplate
+from langchain_core.tools import tool
 
 from . import LLM
 
@@ -45,11 +46,14 @@ def add_document_to_vectorstore() -> SQLiteVec:
 
 
     
-
+@tool
 def retriever(query: str) -> list[str]:
 
     """
     Call the retriever tool to get the policy
+
+    args:
+        query: The query to search for in the vectorstore
     """
     vector_db = SQLiteVec(table="langchain", embedding=EMBEDDINGS, connection=connection)
 

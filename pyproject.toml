@@ -24,4 +24,7 @@ dependencies = [
     "langchain-ollama>=0.3.2",
     "notebook>=7.4.0",
     "langchain-nomic>=0.1.4",
+    "fastmcp>=2.11.3",
+    "oracledb>=3.3.0",
+    "pandas>=2.2.3",
 ]

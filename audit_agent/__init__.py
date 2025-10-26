@@ -22,7 +22,7 @@ GOOGLE= ChatGoogleGenerativeAI(
 )
 
 OLLAMA = ChatOllama(
-    model="llama3.2:3b",
+    model="llama3.2:3b", #"deepseek-v3.1:671b-cloud",
     temperature=3,
     max_tokens=300,
     # top_p=0.95,

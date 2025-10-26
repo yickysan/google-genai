@@ -6,13 +6,14 @@ from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from langchain_community.tools import DuckDuckGoSearchResults
-
 from . import LLM
 from .router import Router
 from .retriever import retriever
 
 
 search_tool = DuckDuckGoSearchResults()
+
+llm_with_tools = LLM.bind_tools([search_tool, retriever])
 
 llm_router = LLM.with_structured_output(Router)
 
@@ -60,7 +61,7 @@ def audit_assistant(state: AuditAssistantState) -> AuditAssistantState:
 
     if state["messages"]:
         message_history = [SYS_PROMPT.format(context=context)] + state["messages"]
-        output = LLM.invoke(message_history)
+        output = llm_with_tools.invoke(message_history)
 
     else:
         output = AIMessage(content=WELCOME_PROMPT)
@@ -153,6 +154,13 @@ def maybe_route_to_tools(state: AuditAssistantState) -> Literal["tools", "human"
 def retrieve(state: AuditAssistantState) -> AuditAssistantState:
     """
     Call the retriever tool to get the policy
+
+    e.g What is bank's policy on data retention?
+    1. Get the last message from the state
+    2. Get the query from the last message
+    3. Call the retriever tool with the query
+    4. Add the response to the state
+    5. Return the updated state
     """
     # Get the last message from the state
     last_message = state["messages"][-1]

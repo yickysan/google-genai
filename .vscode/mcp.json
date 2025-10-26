@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"mcp-db-service": {
+			"type": "stdio",
+			"command": "uv",
+			"args": [
+                "run",
+				"server.py"
+			]
+		}
+	},
+	"inputs": []
+}
